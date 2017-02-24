@@ -2,6 +2,8 @@
 
 guarded = {}
 
+ABORT_SIGNAL = 0xAB0
+
 guarded.if = (guards) ->
   _positives = {}
   for _, guard in ipairs(guards)
@@ -14,16 +16,17 @@ guarded.do = (guards) ->
   _matches = -1
   while _matches ~= 0
     _positives = {}
-    for i, guard in ipairs(guards)
+    for _, guard in ipairs(guards)
       if guard[1]!
         table.insert(_positives, guard[2])
     _matches = #_positives
     if _matches > 0
-      if _positives[math.random(_matches)]! == 0xAB0
+      if _positives[math.random(_matches)]! == ABORT_SIGNAL
         return
 
 guarded.skip = ->
-guarded.abort = -> 0xAB0
+guarded.abort = -> ABORT_SIGNAL
+guarded.true = -> true
 
 --return guarded
 
@@ -33,7 +36,7 @@ a, b, max = 5, 10, nil
 
 guarded.if{
   {(-> a >= b), (-> max = a)}
-  {(-> b >= b), (-> max = b)}
+  {(-> b >= a), (-> max = b)}
 }
 
 print max
